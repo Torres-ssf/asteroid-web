@@ -36,6 +36,7 @@ const Input: React.FC<InputProps> = ({ icon: Icon, error, ...rest }) => {
       <input
         onFocus={handleInputFocus}
         onBlur={handleInputBlur}
+        autoComplete="off"
         ref={inputRef}
         {...rest}
       />
