@@ -6,12 +6,12 @@ import React, {
 } from 'react';
 
 import { IconBaseProps } from 'react-icons/lib/cjs';
-
-import { Container } from './styles';
+import { FiAlertCircle } from 'react-icons/fi';
+import { Container, Error } from './styles';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   icon?: React.ComponentType<IconBaseProps>;
-  error?: boolean;
+  error?: string | undefined;
 }
 
 const Input: React.FC<InputProps> = ({ icon: Icon, error, ...rest }) => {
@@ -40,6 +40,12 @@ const Input: React.FC<InputProps> = ({ icon: Icon, error, ...rest }) => {
         ref={inputRef}
         {...rest}
       />
+
+      {error && (
+        <Error title={error}>
+          <FiAlertCircle color="#c53030" size={22} />
+        </Error>
+      )}
     </Container>
   );
 };
