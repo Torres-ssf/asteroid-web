@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components';
+import Tooptip from '../Tooltip';
 
 interface ContainerProps {
   isFocused: boolean;
@@ -52,5 +53,18 @@ export const Container = styled.div<ContainerProps>`
 
   svg {
     margin-right: 16px;
+  }
+`;
+
+export const Error = styled(Tooptip)`
+  height: 20px;
+
+  span {
+    background: #c53030;
+    color: #fff;
+
+    &::before {
+      border-color: #c53030 transparent;
+    }
   }
 `;
