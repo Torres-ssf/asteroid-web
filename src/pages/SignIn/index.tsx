@@ -5,6 +5,8 @@ import * as Yup from 'yup';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 
+import { useAuth } from '../../hooks/auth';
+
 import {
   Container,
   Content,
@@ -23,6 +25,8 @@ const SignIn: React.FC = () => {
   const [inputErrors, setInputErrors] = useState<ValidationErrors>(
     {} as ValidationErrors,
   );
+
+  const { signIn } = useAuth();
 
   const handleSubmit = useCallback(
     async (event: React.FormEvent) => {
@@ -43,6 +47,10 @@ const SignIn: React.FC = () => {
             abortEarly: false,
           },
         );
+
+        setInputErrors({});
+
+        await signIn({ email, password });
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
@@ -51,7 +59,7 @@ const SignIn: React.FC = () => {
         }
       }
     },
-    [email, password],
+    [signIn, email, password],
   );
 
   return (
