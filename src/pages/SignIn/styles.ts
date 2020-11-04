@@ -1,7 +1,18 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { Link } from 'react-router-dom';
 import { shade } from 'polished';
 import signInBackgroundImg from '../../assets/asteroid-1.jpg';
+
+const formAnimation = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
 
 export const Container = styled.main`
   height: 100vh;
@@ -20,6 +31,7 @@ export const Content = styled.div`
 `;
 
 export const FormContainer = styled.div`
+  animation: ${formAnimation} 1s;
   display: flex;
   flex-direction: column;
   justify-content: center;
