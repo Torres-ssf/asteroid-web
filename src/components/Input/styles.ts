@@ -15,6 +15,7 @@ export const Container = styled.div<ContainerProps>`
   color: #666360;
   align-items: center;
   padding: 16px;
+  height: 60px;
   width: 100%;
 
   & + div {
