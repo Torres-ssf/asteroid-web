@@ -1,7 +1,7 @@
 import styled, { keyframes } from 'styled-components';
 import { Link } from 'react-router-dom';
 import { shade } from 'polished';
-import signUpBackgroundImg from '../../assets/asteroid-1.jpg';
+import signUpBackgroundImg from '../../assets/asteroid-2.jpg';
 
 const formAnimation = keyframes`
   from {
