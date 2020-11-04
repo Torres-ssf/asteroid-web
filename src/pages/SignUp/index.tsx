@@ -9,6 +9,8 @@ import api from '../../services/api';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 
+import { useToast } from '../../hooks/toast';
+
 import getValidationErrors, {
   ValidationErrors,
 } from '../../util/getValidationErrors';
@@ -30,7 +32,7 @@ const SignUp: React.FC = () => {
   const [inputErrors, setInputErrors] = useState<ValidationErrors>(
     {} as ValidationErrors,
   );
-
+  const { addToast } = useToast();
   const history = useHistory();
 
   const handleSubmit = useCallback(
@@ -71,15 +73,41 @@ const SignUp: React.FC = () => {
         });
 
         history.push('/');
+
+        addToast({
+          type: 'success',
+          title: 'Account created successfully',
+          description: 'You can already sign in ',
+        });
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
 
           setInputErrors({ ...errors });
+
+          return;
         }
+
+        let description = '';
+
+        if (err.response) {
+          const { data: errorData } = err.response;
+          if (errorData && errorData.message) {
+            description = errorData.message;
+          }
+        }
+
+        addToast({
+          type: 'error',
+          title: 'Error while creating new account',
+          description:
+            description === ''
+              ? 'An error ocorrered, please check your network connection and try again'
+              : description,
+        });
       }
     },
-    [history, name, email, password, passwordConfirmation],
+    [addToast, history, name, email, password, passwordConfirmation],
   );
 
   return (
