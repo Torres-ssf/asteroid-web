@@ -1,5 +1,5 @@
 import React, { useState, useContext, createContext, useCallback } from 'react';
-import api from '../services/api';
+import { appApi } from '../services/api';
 
 interface User {
   id: string;
@@ -26,10 +26,21 @@ interface AuthContextData {
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 const AuthProvider: React.FC = ({ children }) => {
-  const [data, setData] = useState<AuthState>({} as AuthState);
+  const [data, setData] = useState<AuthState>(() => {
+    const token = localStorage.getItem('@AsteroidWeb:token');
+    const user = localStorage.getItem('@AsteroidWeb:user');
+
+    if (token && user) {
+      appApi.defaults.headers.authorization = `Bearer ${token}`;
+
+      return { token, user: JSON.parse(user) };
+    }
+
+    return {} as AuthState;
+  });
 
   const signIn = useCallback(async ({ email, password }) => {
-    const res = await api.post('sessions', {
+    const res = await appApi.post('sessions', {
       email,
       password,
     });
@@ -39,7 +50,7 @@ const AuthProvider: React.FC = ({ children }) => {
     localStorage.setItem('@AsteroidWeb:token', token);
     localStorage.setItem('@AsteroidWeb:user', JSON.stringify(user));
 
-    api.defaults.headers.authorization = `Bearer ${token}`;
+    appApi.defaults.headers.authorization = `Bearer ${token}`;
 
     setData({ user, token });
   }, []);
