@@ -23,6 +23,14 @@ export default createGlobalStyle`
     font-weight: 500;
   }
 
+  a {
+    text-decoration: none;
+  }
+
+  ul {
+    list-style: none;
+  }
+
   button {
     cursor: pointer;
   }
