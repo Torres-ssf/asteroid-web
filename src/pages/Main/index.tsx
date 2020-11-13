@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from 'react';
 
 import DayPicker, { DateUtils } from 'react-day-picker';
 
@@ -10,6 +16,7 @@ import { asteroidApiId, asteroiApiWeekly } from '../../services/api';
 
 import Header from '../../components/Header';
 import Asteroid from '../../components/Asteroid';
+import LoadingContainer from '../../components/LoadingContainer';
 
 import { IAppAsteroid } from '../../protocols';
 
@@ -27,7 +34,10 @@ import 'react-day-picker/lib/style.css';
 
 const Main: React.FC = () => {
   const [asteroids, setAsteroids] = useState<IAppAsteroid[]>([]);
+
   const [currentAsteroids, setCurrentAsteroids] = useState<IAppAsteroid[]>([]);
+
+  const [loading, setLoading] = useState(false);
 
   const [dateRange, setDateRange] = useState({
     from: set(new Date(), {
@@ -47,10 +57,15 @@ const Main: React.FC = () => {
   const [searchInput, setSearchInput] = useState('');
 
   const [currentPage, setCurrentPage] = useState(1);
+
   const [totalPages, setTotalPages] = useState(1);
+
+  const filterContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+
       if (searchInput !== '') {
         try {
           const res = await asteroidApiId.get(searchInput);
@@ -77,13 +92,13 @@ const Main: React.FC = () => {
 
           const asteroidArr = extractAsteroiBulkData(res.data);
 
-          setTotalPages(Math.ceil(asteroidArr.length / 10));
-
           setAsteroids(asteroidArr);
         } catch (err) {
           console.log(err);
         }
       }
+
+      setLoading(false);
     };
 
     fetchData();
@@ -105,27 +120,6 @@ const Main: React.FC = () => {
     },
     [],
   );
-
-  const asteroidsList = useMemo(() => {
-    return currentAsteroids.map(asteroid => {
-      return (
-        <Asteroid
-          id={asteroid.id}
-          key={asteroid.id}
-          asteroidListNumber={asteroid.asteroidListNumber}
-          name={asteroid.name}
-          absoluteMagnitude={asteroid.absoluteMagnitude}
-          isPotentiallyHazardous={asteroid.isPotentiallyHazardous}
-          closeApproachDate={asteroid.closeApproachDate}
-          closeApproachTime={asteroid.closeApproachTime}
-          missDistance={asteroid.missDistance}
-          relativeVelocity={asteroid.relativeVelocity}
-          estimatedDiameter={asteroid.estimatedDiameter}
-          nasaUrl={asteroid.nasaUrl}
-        />
-      );
-    });
-  }, [currentAsteroids]);
 
   const handleDayClick = useCallback(
     day => {
@@ -159,6 +153,10 @@ const Main: React.FC = () => {
 
   const handlePageChange = useCallback(({ selected: pageSelected }) => {
     setCurrentPage(pageSelected + 1);
+
+    if (filterContainerRef.current) {
+      filterContainerRef.current.scrollIntoView();
+    }
   }, []);
 
   const modifies = useMemo(() => {
@@ -168,12 +166,33 @@ const Main: React.FC = () => {
     };
   }, [dateRange]);
 
+  const asteroidList = useMemo(() => {
+    return currentAsteroids.map(asteroid => {
+      return (
+        <Asteroid
+          id={asteroid.id}
+          key={asteroid.id}
+          asteroidListNumber={asteroid.asteroidListNumber}
+          name={asteroid.name}
+          absoluteMagnitude={asteroid.absoluteMagnitude}
+          isPotentiallyHazardous={asteroid.isPotentiallyHazardous}
+          closeApproachDate={asteroid.closeApproachDate}
+          closeApproachTime={asteroid.closeApproachTime}
+          missDistance={asteroid.missDistance}
+          relativeVelocity={asteroid.relativeVelocity}
+          estimatedDiameter={asteroid.estimatedDiameter}
+          nasaUrl={asteroid.nasaUrl}
+        />
+      );
+    });
+  }, [currentAsteroids]);
+
   return (
     <Container>
       <Header userName="Sergio" />
       <h2>Near Earth Objects</h2>
 
-      <AsteroidFilterContainer>
+      <AsteroidFilterContainer ref={filterContainerRef}>
         <CalendarContainer>
           <h3>Select a date range</h3>
           <DayPicker
@@ -199,19 +218,25 @@ const Main: React.FC = () => {
       </AsteroidFilterContainer>
 
       <AsteroidsList>
-        {asteroidsList}
-        <ReactPaginate
-          previousLabel="back"
-          nextLabel="next"
-          breakLabel="..."
-          breakClassName="break-me"
-          pageCount={totalPages}
-          forcePage={currentPage - 1}
-          marginPagesDisplayed={2}
-          pageRangeDisplayed={2}
-          activeClassName="active"
-          onPageChange={handlePageChange}
-        />
+        {loading ? (
+          <LoadingContainer />
+        ) : (
+          <>
+            {asteroidList}
+            <ReactPaginate
+              previousLabel="back"
+              nextLabel="next"
+              breakLabel="..."
+              breakClassName="break-me"
+              pageCount={totalPages}
+              forcePage={currentPage - 1}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={2}
+              activeClassName="active"
+              onPageChange={handlePageChange}
+            />
+          </>
+        )}
       </AsteroidsList>
     </Container>
   );
