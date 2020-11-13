@@ -8,6 +8,10 @@ export default createGlobalStyle`
     outline: 0;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     background: #312e38;
     color: #FFF;
