@@ -9,6 +9,7 @@ export interface IAppAsteroid {
   missDistance: number;
   relativeVelocity: string;
   isPotentiallyHazardous: boolean;
+  asteroidListNumber: number;
 }
 
 export interface IAsteroidEstimatedDiameter {
