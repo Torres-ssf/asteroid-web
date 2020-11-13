@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const Container = styled.a`
+export const Container = styled.div`
   background: #f4ede8;
   border-radius: 4px;
   color: #312e38;
@@ -11,6 +11,7 @@ export const Container = styled.a`
   position: relative;
   padding: 30px;
   margin: 2px;
+  max-width: 1200px;
 `;
 
 export const ListNumber = styled.span`

@@ -2,15 +2,16 @@ import React, { useMemo } from 'react';
 import { format } from 'date-fns';
 
 import AsteroidItem from './AsteroidItem';
-import { IAsteroid } from '../../protocols/asteroidProtocols';
+import { IAppAsteroid } from '../../protocols';
 
 import { Container, ListNumber } from './styles';
 
-interface AsteroidProps extends IAsteroid {
+interface AsteroidProps extends IAppAsteroid {
   asteroidListNumber: number;
 }
 
 const Asteroid: React.FC<AsteroidProps> = ({
+  id,
   name,
   asteroidListNumber,
   isPotentiallyHazardous,
@@ -42,7 +43,7 @@ const Asteroid: React.FC<AsteroidProps> = ({
   }, [closeApproachTime]);
 
   const proximityDistance = useMemo(() => {
-    return parseFloat(missDistance).toLocaleString().concat(' kilometers');
+    return missDistance.toLocaleString().concat(' kilometers');
   }, [missDistance]);
 
   const asteroidSpeed = useMemo(() => {
@@ -56,27 +57,39 @@ const Asteroid: React.FC<AsteroidProps> = ({
     return `${formatedMin} ~ ${formatedMax} meters`;
   }, [estimatedDiameter]);
 
+  const link = useMemo(() => {
+    return (
+      <a href={nasaUrl} target="_blank" rel="noopener noreferrer">
+        Link
+      </a>
+    );
+  }, [nasaUrl]);
+
   return (
-    <Container target="_blank" rel="noopener noreferrer" href={nasaUrl}>
+    <Container>
       <ListNumber>{listNumber}</ListNumber>
-      <AsteroidItem heading="Asteroid name" paragraph={name} />
 
-      <AsteroidItem
-        heading="Is potentially hazardous"
-        paragraph={isHazardous}
-      />
-      <AsteroidItem heading="Approach date" paragraph={aproachDate} />
+      <AsteroidItem heading="Asteroid name">{name}</AsteroidItem>
 
-      <AsteroidItem heading="Approach time" paragraph={time} />
+      <AsteroidItem heading="Is potentially hazardous">
+        {isHazardous}
+      </AsteroidItem>
 
-      <AsteroidItem
-        heading="Distance from Earth"
-        paragraph={proximityDistance}
-      />
+      <AsteroidItem heading="Approach date">{aproachDate}</AsteroidItem>
 
-      <AsteroidItem heading="Estimated Diameter" paragraph={diameter} />
+      <AsteroidItem heading="Approach time">{time}</AsteroidItem>
 
-      <AsteroidItem heading="Approximate speed" paragraph={asteroidSpeed} />
+      <AsteroidItem heading="Distance from Earth">
+        {proximityDistance}
+      </AsteroidItem>
+
+      <AsteroidItem heading="Estimated Diameter">{diameter}</AsteroidItem>
+
+      <AsteroidItem heading="Approximate speed">{asteroidSpeed}</AsteroidItem>
+
+      <AsteroidItem heading="Asteroid Id">{id}</AsteroidItem>
+
+      <AsteroidItem heading="Nasa page link">{link}</AsteroidItem>
     </Container>
   );
 };
