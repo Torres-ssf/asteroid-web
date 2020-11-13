@@ -1,56 +1,72 @@
-import { IAsteroid } from '../protocols/asteroidProtocols';
+import { IAppAsteroid, IAPIAsteroid, IAPIData } from '../protocols';
 
-export const extractAsteroidDailyData = (asteroidData: any) => {
-  const asteroidsArr: IAsteroid[] = [];
+export const extractAsteroiBulkData = (
+  asteroidData: IAPIData,
+): IAppAsteroid[] => {
+  const asteroidsArr: IAppAsteroid[] = [];
 
   const { near_earth_objects } = asteroidData;
 
-  const asteroidsDataArr = Object.values(near_earth_objects)[0] as any;
+  const asteroidMultiDaysData = Object.values(near_earth_objects);
 
-  for (let i = 0; i < asteroidsDataArr.length; i += 1) {
-    const {
-      id,
-      name,
-      absolute_magnitude_h,
-      nasa_jpl_url,
-      estimated_diameter,
-      close_approach_data,
-      is_potentially_hazardous_asteroid,
-    } = asteroidsDataArr[i];
+  for (let i = 0; i < asteroidMultiDaysData.length; i += 1) {
+    const asteroidDailyData: IAPIAsteroid[] = asteroidMultiDaysData[i];
 
-    const {
-      close_approach_date,
-      close_approach_date_full,
-      miss_distance,
-      relative_velocity,
-    } = close_approach_data[0] as any;
+    for (let j = 0; j < asteroidDailyData.length; j += 1) {
+      const singleAsteroidData = extractSingleAsteroidData(
+        asteroidDailyData[j],
+      );
 
-    const {
-      meters: { estimated_diameter_max: max, estimated_diameter_min: min },
-    } = estimated_diameter as any;
-
-    const { kilometers_per_second } = relative_velocity as any;
-
-    const missDistance = miss_distance.kilometers;
-
-    const estimatedDiameter = {
-      min,
-      max,
-    };
-
-    asteroidsArr.push({
-      id,
-      name,
-      absoluteMagnitude: absolute_magnitude_h,
-      nasaUrl: nasa_jpl_url,
-      estimatedDiameter,
-      closeApproachDate: close_approach_date,
-      closeApproachTime: close_approach_date_full,
-      missDistance,
-      relativeVelocity: kilometers_per_second,
-      isPotentiallyHazardous: is_potentially_hazardous_asteroid,
-    });
+      asteroidsArr.push(singleAsteroidData);
+    }
   }
 
   return asteroidsArr;
+};
+
+export const extractSingleAsteroidData = (
+  singleAsteroidData: IAPIAsteroid,
+): IAppAsteroid => {
+  const {
+    id,
+    name,
+    absolute_magnitude_h,
+    nasa_jpl_url,
+    estimated_diameter,
+    close_approach_data,
+    is_potentially_hazardous_asteroid,
+  } = singleAsteroidData;
+
+  const {
+    close_approach_date,
+    close_approach_date_full,
+    miss_distance,
+    relative_velocity,
+  } = close_approach_data[0];
+
+  const {
+    meters: { estimated_diameter_max: max, estimated_diameter_min: min },
+  } = estimated_diameter;
+
+  const { kilometers_per_second } = relative_velocity;
+
+  const missDistance = parseFloat(miss_distance.kilometers);
+
+  const estimatedDiameter = {
+    min,
+    max,
+  };
+
+  return {
+    id,
+    name,
+    absoluteMagnitude: absolute_magnitude_h,
+    nasaUrl: nasa_jpl_url,
+    estimatedDiameter,
+    closeApproachDate: close_approach_date,
+    closeApproachTime: close_approach_date_full,
+    missDistance,
+    relativeVelocity: kilometers_per_second,
+    isPotentiallyHazardous: is_potentially_hazardous_asteroid,
+  };
 };
