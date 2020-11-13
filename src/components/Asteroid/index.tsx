@@ -6,11 +6,7 @@ import { IAppAsteroid } from '../../protocols';
 
 import { Container, ListNumber } from './styles';
 
-interface AsteroidProps extends IAppAsteroid {
-  asteroidListNumber: number;
-}
-
-const Asteroid: React.FC<AsteroidProps> = ({
+const Asteroid: React.FC<IAppAsteroid> = ({
   id,
   name,
   asteroidListNumber,
