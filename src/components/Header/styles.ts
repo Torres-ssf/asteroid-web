@@ -20,6 +20,13 @@ export const Container = styled.header`
       justify-content: center;
       align-items: center;
     }
+
+    @media (max-width: 900px) {
+      span,
+      button {
+        margin: 0 30px;
+      }
+    }
   }
 `;
 
@@ -29,9 +36,5 @@ export const UserContainer = styled.span`
 
   a {
     color: #197bbd;
-  }
-
-  @media (max-width: 900px) {
-    margin: 0 30px;
   }
 `;
