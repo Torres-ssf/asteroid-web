@@ -21,7 +21,7 @@ export const Container = styled.header`
       align-items: center;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 1200px) {
       span,
       button {
         margin: 0 30px;
