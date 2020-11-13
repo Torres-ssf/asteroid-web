@@ -3,7 +3,7 @@ import { IAppAsteroid, IAPIAsteroid, IAPIData } from '../protocols';
 export const extractAsteroiBulkData = (
   asteroidData: IAPIData,
 ): IAppAsteroid[] => {
-  const asteroidsArr: IAppAsteroid[] = [];
+  const asteroidsArr: Omit<IAppAsteroid, 'asteroidListNumber'>[] = [];
 
   const { near_earth_objects } = asteroidData;
 
@@ -21,12 +21,14 @@ export const extractAsteroiBulkData = (
     }
   }
 
-  return asteroidsArr;
+  return asteroidsArr
+    .sort((a, b) => a.missDistance - b.missDistance)
+    .map((asteroid, index) => ({ ...asteroid, asteroidListNumber: index }));
 };
 
 export const extractSingleAsteroidData = (
   singleAsteroidData: IAPIAsteroid,
-): IAppAsteroid => {
+): Omit<IAppAsteroid, 'asteroidListNumber'> => {
   const {
     id,
     name,
