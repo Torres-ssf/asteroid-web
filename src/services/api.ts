@@ -9,9 +9,16 @@ const appApi = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
 });
 
-const asteroidApi = axios.create({
-  baseURL: 'https://api.nasa.gov/neo/rest/v1/feed/today',
+const url = 'https://api.nasa.gov/neo/rest/v1';
+
+const asteroidApiId = axios.create({
+  baseURL: url.concat('/neo'),
   params: asteroidApiParams,
 });
 
-export { appApi, asteroidApi };
+const asteroiApiWeekly = axios.create({
+  baseURL: url.concat('/feed'),
+  params: asteroidApiParams,
+});
+
+export { appApi, asteroidApiId, asteroiApiWeekly };
