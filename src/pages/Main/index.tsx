@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import DayPicker, { DateUtils } from 'react-day-picker';
+
 import { differenceInDays, set, format, isBefore } from 'date-fns';
+
 import { asteroidApiId, asteroiApiWeekly } from '../../services/api';
 
 import Header from '../../components/Header';
@@ -23,12 +25,21 @@ import 'react-day-picker/lib/style.css';
 const Main: React.FC = () => {
   const [asteroids, setAsteroids] = useState<IAppAsteroid[]>([]);
 
-  const [dateFrom, setDateFrom] = useState<Date>(
-    set(new Date(), { hours: 12, minutes: 0, seconds: 0, milliseconds: 0 }),
-  );
-  const [dateTo, setDateTo] = useState<Date>(
-    set(new Date(), { hours: 12, minutes: 0, seconds: 0, milliseconds: 0 }),
-  );
+  const [dateRange, setDateRange] = useState({
+    from: set(new Date(), {
+      hours: 12,
+      minutes: 0,
+      seconds: 0,
+      milliseconds: 0,
+    }),
+    to: set(new Date(), {
+      hours: 12,
+      minutes: 0,
+      seconds: 0,
+      milliseconds: 0,
+    }),
+  });
+
   const [searchInput, setSearchInput] = useState('');
 
   useEffect(() => {
@@ -43,19 +54,23 @@ const Main: React.FC = () => {
         } catch (err) {
           console.log(err);
         }
-      } else if (dateFrom && dateTo) {
+      } else {
         try {
-          const strFrom = format(dateFrom, 'yyyy-MM-dd');
-          const strTo = format(dateTo, 'yyyy-MM-dd');
+          const { from, to } = dateRange;
+
+          const formattedFrom = format(from, 'yyyy-MM-dd');
+          const formattedTo = format(to, 'yyyy-MM-dd');
 
           const res = await asteroiApiWeekly.get('', {
             params: {
-              start_date: strFrom,
-              end_date: strTo,
+              start_date: formattedFrom,
+              end_date: formattedTo,
             },
           });
 
           const asteroidArr = extractAsteroiBulkData(res.data);
+
+          asteroidArr.sort((a, b) => a.missDistance - b.missDistance);
 
           setAsteroids(asteroidArr);
         } catch (err) {
@@ -65,7 +80,7 @@ const Main: React.FC = () => {
     };
 
     fetchData();
-  }, [searchInput, dateFrom, dateTo]);
+  }, [searchInput, dateRange]);
 
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,26 +90,24 @@ const Main: React.FC = () => {
   );
 
   const asteroidsList = useMemo(() => {
-    return asteroids
-      .sort((a, b) => a.missDistance - b.missDistance)
-      .map((asteroid, index) => {
-        return (
-          <Asteroid
-            id={asteroid.id}
-            key={asteroid.id}
-            name={asteroid.name}
-            asteroidListNumber={index}
-            absoluteMagnitude={asteroid.absoluteMagnitude}
-            isPotentiallyHazardous={asteroid.isPotentiallyHazardous}
-            closeApproachDate={asteroid.closeApproachDate}
-            closeApproachTime={asteroid.closeApproachTime}
-            missDistance={asteroid.missDistance}
-            relativeVelocity={asteroid.relativeVelocity}
-            estimatedDiameter={asteroid.estimatedDiameter}
-            nasaUrl={asteroid.nasaUrl}
-          />
-        );
-      });
+    return asteroids.map((asteroid, index) => {
+      return (
+        <Asteroid
+          id={asteroid.id}
+          key={asteroid.id}
+          name={asteroid.name}
+          asteroidListNumber={index}
+          absoluteMagnitude={asteroid.absoluteMagnitude}
+          isPotentiallyHazardous={asteroid.isPotentiallyHazardous}
+          closeApproachDate={asteroid.closeApproachDate}
+          closeApproachTime={asteroid.closeApproachTime}
+          missDistance={asteroid.missDistance}
+          relativeVelocity={asteroid.relativeVelocity}
+          estimatedDiameter={asteroid.estimatedDiameter}
+          nasaUrl={asteroid.nasaUrl}
+        />
+      );
+    });
   }, [asteroids]);
 
   const handleDayClick = useCallback(
@@ -102,37 +115,35 @@ const Main: React.FC = () => {
       setSearchInput('');
 
       const { from, to } = DateUtils.addDayToRange(day, {
-        from: dateFrom,
-        to: dateTo,
+        from: dateRange.from,
+        to: dateRange.to,
       });
 
-      const diffInDays = differenceInDays(to, from);
+      if (!from && !to) {
+        return;
+      }
 
       if (from && !to) {
-        setDateFrom(from);
-        setDateTo(from);
-      } else if (diffInDays > 7) {
-        if (isBefore(from, dateFrom)) {
-          setDateFrom(from);
-          setDateTo(from);
+        setDateRange({ from, to: from });
+      } else if (differenceInDays(to, from) > 7) {
+        if (isBefore(from, dateRange.from)) {
+          setDateRange({ from, to: from });
         } else {
-          setDateFrom(to);
-          setDateTo(to);
+          setDateRange({ from: to, to });
         }
       } else {
-        setDateFrom(from);
-        setDateTo(to);
+        setDateRange({ from, to });
       }
     },
-    [dateFrom, dateTo],
+    [dateRange],
   );
 
   const modifies = useMemo(() => {
     return {
-      start: dateFrom,
-      end: dateTo,
+      start: dateRange.from,
+      end: dateRange.to,
     };
-  }, [dateFrom, dateTo]);
+  }, [dateRange]);
 
   return (
     <Container>
@@ -145,7 +156,10 @@ const Main: React.FC = () => {
           <DayPicker
             className="Selectable"
             numberOfMonths={1}
-            selectedDays={[dateFrom, { from: dateFrom, to: dateTo }]}
+            selectedDays={[
+              dateRange.from,
+              { from: dateRange.from, to: dateRange.to },
+            ]}
             modifiers={modifies}
             onDayClick={handleDayClick}
           />
