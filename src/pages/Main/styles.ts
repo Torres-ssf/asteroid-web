@@ -10,6 +10,18 @@ export const Container = styled.main`
     font-size: 2.5rem;
     margin-top: 50px;
   }
+
+  @media (max-width: 1200px) {
+    h2 {
+      font-size: 2.2rem;
+    }
+  }
+
+  @media (max-width: 700px) {
+    h2 {
+      font-size: 2rem;
+    }
+  }
 `;
 
 export const AsteroidFilterContainer = styled.div`
@@ -21,6 +33,23 @@ export const AsteroidFilterContainer = styled.div`
   h3 {
     font-size: 1.6rem;
     margin-bottom: 40px;
+  }
+
+  @media (max-width: 1100px) {
+    h3 {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+    }
+  }
+
+  @media (max-width: 700px) {
+    margin: 30px auto;
+    flex-direction: column;
+
+    h3 {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+    }
   }
 `;
 
@@ -80,13 +109,42 @@ export const AsteroidInputContainer = styled.div`
       border-color: #197bbd;
     }
   }
+
+  @media (max-width: 700px) {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    margin-top: 20px;
+
+    input {
+      position: relative;
+      transform: unset;
+      width: 220px;
+      top: unset;
+      right: unset;
+      margin-top: 20px;
+    }
+  }
 `;
 
 export const AsteroidsList = styled.div`
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+
+  @media (max-width: 1300px) {
+    margin: 0 30px;
+  }
+
+  @media (max-width: 800px) {
+    margin: 0 20px;
+  }
+
+  @media (max-width: 500px) {
+    margin: 0 5px;
+  }
 
   ul {
     display: flex;
