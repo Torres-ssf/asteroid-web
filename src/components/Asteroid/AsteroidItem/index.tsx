@@ -1,17 +1,16 @@
 import React from 'react';
 
-import { Container, Heading, Paragraph } from './styles';
+import { Container, Heading } from './styles';
 
 interface AsteroidItemProps {
   heading: string;
-  paragraph: string;
 }
 
-const AsteroidItem: React.FC<AsteroidItemProps> = ({ heading, paragraph }) => {
+const AsteroidItem: React.FC<AsteroidItemProps> = ({ heading, children }) => {
   return (
     <Container>
       <Heading>{heading}</Heading>
-      <Paragraph>{paragraph}</Paragraph>
+      {children}
     </Container>
   );
 };
