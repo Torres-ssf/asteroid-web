@@ -12,6 +12,8 @@ import { differenceInDays, set, format, isBefore } from 'date-fns';
 
 import ReactPaginate from 'react-paginate';
 
+import { FiSearch } from 'react-icons/fi';
+
 import { asteroidApiId, asteroiApiWeekly } from '../../services/api';
 
 import Header from '../../components/Header';
@@ -28,9 +30,15 @@ import {
   AsteroidFilterContainer,
   CalendarContainer,
   AsteroidInputContainer,
+  FeedbackMessage,
 } from './styles';
 
 import 'react-day-picker/lib/style.css';
+
+interface DateRange {
+  from: Date | null;
+  to: Date | null;
+}
 
 const Main: React.FC = () => {
   const [asteroids, setAsteroids] = useState<IAppAsteroid[]>([]);
@@ -65,44 +73,35 @@ const Main: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setCurrentPage(1);
 
-      if (searchInput !== '') {
-        try {
-          const res = await asteroidApiId.get(searchInput);
+      try {
+        const { from, to } = dateRange;
 
-          const asteroidData = extractSingleAsteroidData(res.data);
+        const formattedFrom = format(from, 'yyyy-MM-dd');
+        const formattedTo = format(to, 'yyyy-MM-dd');
 
-          setAsteroids([{ ...asteroidData, asteroidListNumber: 1 }]);
-        } catch (err) {
-          console.log(err);
-        }
-      } else {
-        try {
-          const { from, to } = dateRange;
+        const res = await asteroiApiWeekly.get('', {
+          params: {
+            start_date: formattedFrom,
+            end_date: formattedTo,
+          },
+        });
 
-          const formattedFrom = format(from, 'yyyy-MM-dd');
-          const formattedTo = format(to, 'yyyy-MM-dd');
+        const asteroidArr = extractAsteroiBulkData(res.data);
 
-          const res = await asteroiApiWeekly.get('', {
-            params: {
-              start_date: formattedFrom,
-              end_date: formattedTo,
-            },
-          });
+        console.log(res.data);
 
-          const asteroidArr = extractAsteroiBulkData(res.data);
-
-          setAsteroids(asteroidArr);
-        } catch (err) {
-          console.log(err);
-        }
+        setAsteroids(asteroidArr);
+      } catch (err) {
+        console.log(err);
       }
 
       setLoading(false);
     };
 
     fetchData();
-  }, [searchInput, dateRange]);
+  }, [dateRange]);
 
   useEffect(() => {
     setCurrentAsteroids(
@@ -151,6 +150,26 @@ const Main: React.FC = () => {
     [dateRange],
   );
 
+  const handleSearchButton = useCallback(async () => {
+    if (searchInput !== '') {
+      setLoading(true);
+      setCurrentPage(1);
+
+      try {
+        const res = await asteroidApiId.get(searchInput);
+
+        const asteroidData = extractSingleAsteroidData(res.data);
+
+        setAsteroids([{ ...asteroidData, asteroidListNumber: 1 }]);
+      } catch (err) {
+        console.log(err.response);
+        setAsteroids([]);
+      }
+
+      setLoading(false);
+    }
+  }, [setLoading, searchInput]);
+
   const handlePageChange = useCallback(({ selected: pageSelected }) => {
     setCurrentPage(pageSelected + 1);
 
@@ -187,6 +206,45 @@ const Main: React.FC = () => {
     });
   }, [currentAsteroids]);
 
+  const asteroidView = useMemo(() => {
+    if (loading) {
+      return <LoadingContainer />;
+    }
+
+    if (asteroids.length === 0) {
+      return (
+        <p style={{ fontSize: 20, color: '#c53030' }}>
+          No objects found for the given date/id
+        </p>
+      );
+    }
+
+    return (
+      <>
+        {asteroidList}
+        <ReactPaginate
+          previousLabel="back"
+          nextLabel="next"
+          breakLabel="..."
+          breakClassName="break-me"
+          pageCount={totalPages}
+          forcePage={currentPage - 1}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={2}
+          activeClassName="active"
+          onPageChange={handlePageChange}
+        />
+      </>
+    );
+  }, [
+    asteroids,
+    asteroidList,
+    loading,
+    currentPage,
+    totalPages,
+    handlePageChange,
+  ]);
+
   return (
     <Container>
       <Header userName="Sergio" />
@@ -208,36 +266,21 @@ const Main: React.FC = () => {
         </CalendarContainer>
         <AsteroidInputContainer>
           <h3>... or search for an specific asteroid</h3>
-          <input
-            type="text"
-            placeholder="asteroid id"
-            value={searchInput}
-            onChange={handleInputChange}
-          />
+          <div>
+            <input
+              type="text"
+              placeholder="asteroid id"
+              value={searchInput}
+              onChange={handleInputChange}
+            />
+            <button type="button" onClick={handleSearchButton}>
+              <FiSearch size={20} />
+            </button>
+          </div>
         </AsteroidInputContainer>
       </AsteroidFilterContainer>
 
-      <AsteroidsList>
-        {loading ? (
-          <LoadingContainer />
-        ) : (
-          <>
-            {asteroidList}
-            <ReactPaginate
-              previousLabel="back"
-              nextLabel="next"
-              breakLabel="..."
-              breakClassName="break-me"
-              pageCount={totalPages}
-              forcePage={currentPage - 1}
-              marginPagesDisplayed={2}
-              pageRangeDisplayed={2}
-              activeClassName="active"
-              onPageChange={handlePageChange}
-            />
-          </>
-        )}
-      </AsteroidsList>
+      <AsteroidsList>{asteroidView}</AsteroidsList>
     </Container>
   );
 };
