@@ -1,10 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { format } from 'date-fns';
 
+import { BsBookmarkDash, BsBookmarkCheck } from 'react-icons/bs';
 import AsteroidItem from './AsteroidItem';
 import { IAppAsteroid } from '../../protocols';
 
-import { Container, ListNumber } from './styles';
+import { Container, ListNumber, BookmarkIconContainer } from './styles';
 
 const Asteroid: React.FC<IAppAsteroid> = ({
   id,
@@ -18,6 +19,8 @@ const Asteroid: React.FC<IAppAsteroid> = ({
   estimatedDiameter,
   nasaUrl,
 }) => {
+  const [bookmarked, setBookmarked] = useState(true);
+
   const listNumber = useMemo(() => {
     return `${asteroidListNumber + 1}.`;
   }, [asteroidListNumber]);
@@ -86,6 +89,12 @@ const Asteroid: React.FC<IAppAsteroid> = ({
       <AsteroidItem heading="Asteroid Id">{id}</AsteroidItem>
 
       <AsteroidItem heading="Nasa page link">{link}</AsteroidItem>
+
+      <BookmarkIconContainer>
+        <button type="button" title="Bookmark this asteroid">
+          <BsBookmarkDash size={24} color="#CAC6C7" />
+        </button>
+      </BookmarkIconContainer>
     </Container>
   );
 };

@@ -35,3 +35,14 @@ export const ListNumber = styled.span`
   font-size: 0.9rem;
   font-weight: 500;
 `;
+
+export const BookmarkIconContainer = styled.div`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+  button {
+    background: transparent;
+    border: none;
+  }
+`;
