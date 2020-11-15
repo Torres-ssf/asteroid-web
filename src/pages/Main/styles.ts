@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import { FiSearch } from 'react-icons/fi';
+
 export const Container = styled.main`
   display: flex;
   flex-direction: column;
@@ -91,22 +93,52 @@ export const CalendarContainer = styled.div`
   }
 `;
 
+export const SearchIcon = styled(FiSearch)``;
+
 export const AsteroidInputContainer = styled.div`
   flex: 1;
   position: relative;
   text-align: center;
 
-  input {
-    border: 2px solid #fff;
-    border-radius: 5px;
-    padding: 10px 20px;
+  div {
+    display: flex;
+    flex-direction: row;
     position: absolute;
     transform: translate(50%, -50%);
     top: 50%;
     right: 50%;
+    justify-content: center;
+    width: 100%;
+    align-items: center;
 
-    &:focus {
-      border-color: #197bbd;
+    input {
+      border: 2px solid #fff;
+      border-radius: 5px;
+      height: 48px;
+      padding: 10px 20px;
+
+      &:focus {
+        border-color: #197bbd;
+      }
+    }
+
+    button {
+      background: #197bbd;
+      color: #f4ede8;
+      border: 1px solid #197bbd;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 40px;
+      margin-left: 12px;
+      transition: 500ms;
+
+      &:hover {
+        background: #f4ede8;
+        color: #197bbd;
+      }
     }
   }
 
@@ -117,13 +149,16 @@ export const AsteroidInputContainer = styled.div`
     flex-direction: column;
     margin-top: 20px;
 
-    input {
+    div {
+      margin: 40px 0;
       position: relative;
       transform: unset;
-      width: 220px;
       top: unset;
       right: unset;
-      margin-top: 20px;
+    }
+
+    input {
+      width: 220px;
     }
   }
 `;
@@ -181,4 +216,8 @@ export const AsteroidsList = styled.div`
       display: none;
     }
   }
+`;
+
+export const FeedbackMessage = styled.p`
+  color: #c53030;
 `;
