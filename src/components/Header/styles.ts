@@ -36,5 +36,12 @@ export const UserContainer = styled.span`
 
   a {
     color: #197bbd;
+    margin-top: 2px;
+  }
+
+  a + a {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-top: 8px;
   }
 `;
