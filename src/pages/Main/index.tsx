@@ -30,15 +30,10 @@ import {
   AsteroidFilterContainer,
   CalendarContainer,
   AsteroidInputContainer,
-  FeedbackMessage,
 } from './styles';
 
 import 'react-day-picker/lib/style.css';
-
-interface DateRange {
-  from: Date | null;
-  to: Date | null;
-}
+import { useToast } from '../../hooks/toast';
 
 const Main: React.FC = () => {
   const [asteroids, setAsteroids] = useState<IAppAsteroid[]>([]);
@@ -68,6 +63,8 @@ const Main: React.FC = () => {
 
   const [totalPages, setTotalPages] = useState(1);
 
+  const { addToast } = useToast();
+
   const filterContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -90,18 +87,32 @@ const Main: React.FC = () => {
 
         const asteroidArr = extractAsteroiBulkData(res.data);
 
-        console.log(res.data);
-
         setAsteroids(asteroidArr);
       } catch (err) {
-        console.log(err);
+        let description = '';
+
+        if (err.response) {
+          const { data: errorData } = err.response;
+          if (errorData && errorData.message) {
+            description = errorData.message;
+          }
+        }
+
+        addToast({
+          type: 'error',
+          title: 'Error',
+          description:
+            description === ''
+              ? 'An error ocorrered, please check your network connection and try again'
+              : description,
+        });
       }
 
       setLoading(false);
     };
 
     fetchData();
-  }, [dateRange]);
+  }, [dateRange, addToast]);
 
   useEffect(() => {
     setCurrentAsteroids(
@@ -162,7 +173,6 @@ const Main: React.FC = () => {
 
         setAsteroids([{ ...asteroidData, asteroidListNumber: 1 }]);
       } catch (err) {
-        console.log(err.response);
         setAsteroids([]);
       }
 
