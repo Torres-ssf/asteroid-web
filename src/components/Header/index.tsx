@@ -15,7 +15,7 @@ const Header: React.FC<HeaderProps> = ({ userName, profilePage }) => {
       <div>
         <UserContainer>
           Welcome,
-          <Link to="/profile">{userName}</Link>
+          <Link to="/me">{userName}</Link>
           {profilePage && (
             <Link to="/" title="Update profile">
               <FaCog size={22} color="#F4EDE8" />
