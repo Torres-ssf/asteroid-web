@@ -6,6 +6,7 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 
 import { useAuth } from '../../hooks/auth';
+import { useToast } from '../../hooks/toast';
 
 import {
   Container,
@@ -27,6 +28,7 @@ const SignIn: React.FC = () => {
   );
 
   const { signIn } = useAuth();
+  const { addToast } = useToast();
 
   const handleSubmit = useCallback(
     async (event: React.FormEvent) => {
@@ -56,10 +58,30 @@ const SignIn: React.FC = () => {
           const errors = getValidationErrors(err);
 
           setInputErrors({ ...errors });
+
+          return;
         }
+
+        let description = '';
+
+        if (err.response) {
+          const { data: errorData } = err.response;
+          if (errorData && errorData.message) {
+            description = errorData.message;
+          }
+        }
+
+        addToast({
+          type: 'error',
+          title: 'Authentication error',
+          description:
+            description === ''
+              ? 'An error ocorrered, please check your network connection and try again'
+              : description,
+        });
       }
     },
-    [signIn, email, password],
+    [signIn, addToast, email, password],
   );
 
   return (
