@@ -15,9 +15,7 @@ import {
   LinkToSignUp,
   Background,
 } from './styles';
-import getValidationErrors, {
-  ValidationErrors,
-} from '../../util/getValidationErrors';
+import { ValidationErrors, getValidationErrors } from '../../util';
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState('');
