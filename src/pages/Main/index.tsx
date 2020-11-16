@@ -10,14 +10,12 @@ import DayPicker, { DateUtils } from 'react-day-picker';
 
 import { differenceInDays, set, format, isBefore } from 'date-fns';
 
-import ReactPaginate from 'react-paginate';
-
 import { FiSearch } from 'react-icons/fi';
 
 import { asteroidApiId, asteroiApiWeekly } from '../../services/api';
 
 import Header from '../../components/Header';
-import Asteroid from '../../components/Asteroid';
+import AsteroidList from '../../components/AsteroidList';
 import LoadingContainer from '../../components/LoadingContainer';
 
 import { IAppAsteroid } from '../../protocols';
@@ -33,12 +31,11 @@ import {
 } from './styles';
 
 import 'react-day-picker/lib/style.css';
+
 import { useToast } from '../../hooks/toast';
 
 const Main: React.FC = () => {
   const [asteroids, setAsteroids] = useState<IAppAsteroid[]>([]);
-
-  const [currentAsteroids, setCurrentAsteroids] = useState<IAppAsteroid[]>([]);
 
   const [loading, setLoading] = useState(false);
 
@@ -59,10 +56,6 @@ const Main: React.FC = () => {
 
   const [searchInput, setSearchInput] = useState('');
 
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const [totalPages, setTotalPages] = useState(1);
-
   const { addToast } = useToast();
 
   const filterContainerRef = useRef<HTMLDivElement>(null);
@@ -70,7 +63,6 @@ const Main: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      setCurrentPage(1);
 
       try {
         const { from, to } = dateRange;
@@ -114,16 +106,6 @@ const Main: React.FC = () => {
     fetchData();
   }, [dateRange, addToast]);
 
-  useEffect(() => {
-    setCurrentAsteroids(
-      asteroids.slice((currentPage - 1) * 10, currentPage * 10),
-    );
-  }, [asteroids, currentPage]);
-
-  useEffect(() => {
-    setTotalPages(Math.ceil(asteroids.length / 10));
-  }, [asteroids]);
-
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setSearchInput(event.target.value);
@@ -134,8 +116,6 @@ const Main: React.FC = () => {
   const handleDayClick = useCallback(
     day => {
       setSearchInput('');
-
-      setCurrentPage(1);
 
       const { from, to } = DateUtils.addDayToRange(day, {
         from: dateRange.from,
@@ -164,7 +144,6 @@ const Main: React.FC = () => {
   const handleSearchButton = useCallback(async () => {
     if (searchInput !== '') {
       setLoading(true);
-      setCurrentPage(1);
 
       try {
         const res = await asteroidApiId.get(searchInput);
@@ -180,41 +159,12 @@ const Main: React.FC = () => {
     }
   }, [setLoading, searchInput]);
 
-  const handlePageChange = useCallback(({ selected: pageSelected }) => {
-    setCurrentPage(pageSelected + 1);
-
-    if (filterContainerRef.current) {
-      filterContainerRef.current.scrollIntoView();
-    }
-  }, []);
-
   const modifies = useMemo(() => {
     return {
       start: dateRange.from,
       end: dateRange.to,
     };
   }, [dateRange]);
-
-  const asteroidList = useMemo(() => {
-    return currentAsteroids.map(asteroid => {
-      return (
-        <Asteroid
-          id={asteroid.id}
-          key={asteroid.id}
-          asteroidListNumber={asteroid.asteroidListNumber}
-          name={asteroid.name}
-          absoluteMagnitude={asteroid.absoluteMagnitude}
-          isPotentiallyHazardous={asteroid.isPotentiallyHazardous}
-          closeApproachDate={asteroid.closeApproachDate}
-          closeApproachTime={asteroid.closeApproachTime}
-          missDistance={asteroid.missDistance}
-          relativeVelocity={asteroid.relativeVelocity}
-          estimatedDiameter={asteroid.estimatedDiameter}
-          nasaUrl={asteroid.nasaUrl}
-        />
-      );
-    });
-  }, [currentAsteroids]);
 
   const asteroidView = useMemo(() => {
     if (loading) {
@@ -229,31 +179,8 @@ const Main: React.FC = () => {
       );
     }
 
-    return (
-      <>
-        {asteroidList}
-        <ReactPaginate
-          previousLabel="back"
-          nextLabel="next"
-          breakLabel="..."
-          breakClassName="break-me"
-          pageCount={totalPages}
-          forcePage={currentPage - 1}
-          marginPagesDisplayed={2}
-          pageRangeDisplayed={2}
-          activeClassName="active"
-          onPageChange={handlePageChange}
-        />
-      </>
-    );
-  }, [
-    asteroids,
-    asteroidList,
-    loading,
-    currentPage,
-    totalPages,
-    handlePageChange,
-  ]);
+    return <AsteroidList asteroidList={asteroids} />;
+  }, [asteroids, loading]);
 
   return (
     <Container>

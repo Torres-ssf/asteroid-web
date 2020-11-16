@@ -93,8 +93,6 @@ export const CalendarContainer = styled.div`
   }
 `;
 
-export const SearchIcon = styled(FiSearch)``;
-
 export const AsteroidInputContainer = styled.div`
   flex: 1;
   position: relative;
