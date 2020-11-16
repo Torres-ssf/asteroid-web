@@ -1,12 +1,12 @@
 import styled, { keyframes } from 'styled-components';
 import { Link } from 'react-router-dom';
 import { shade } from 'polished';
-import signInBackgroundImg from '../../assets/asteroid-1.jpg';
+import signUpBackgroundImg from '../../assets/asteroid-2.jpg';
 
 const formAnimation = keyframes`
   from {
     opacity: 0;
-    transform: translateX(-50px);
+    transform: translateX(50px);
   }
   to {
     opacity: 1;
@@ -14,9 +14,8 @@ const formAnimation = keyframes`
   }
 `;
 
-export const Container = styled.main`
+export const Container = styled.div`
   height: 100vh;
-
   display: flex;
   align-items: stretch;
 `;
@@ -52,12 +51,16 @@ export const FormContainer = styled.div`
       margin-top: 24px;
       text-decoration: none;
       transition: color 0.2s;
+
+      &:hover {
+        color: ${shade(0.2, '#f4ede8')};
+      }
     }
   }
 `;
 
 export const LinkToSignUp = styled(Link)`
-  color: #197bbd;
+  color: #f4ede8;
   display: flex;
   align-items: center;
   margin-top: 24px;
@@ -65,7 +68,7 @@ export const LinkToSignUp = styled(Link)`
   transition: color 0.2s;
 
   &:hover {
-    color: ${shade(0.2, '#197bbd')};
+    color: ${shade(0.2, '#f4ede8')};
   }
 
   svg {
@@ -75,6 +78,6 @@ export const LinkToSignUp = styled(Link)`
 
 export const Background = styled.div`
   flex: 1;
-  background: url(${signInBackgroundImg}) center no-repeat;
+  background: url(${signUpBackgroundImg}) no-repeat center;
   background-size: cover;
 `;
